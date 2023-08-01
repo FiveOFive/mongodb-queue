@@ -6,10 +6,9 @@
   "scripts": {
     "test": "set -e; for FILE in test/*.js; do echo --- $FILE ---; node $FILE; done"
   },
-  "dependencies": {},
   "devDependencies": {
     "async": "^2.6.2",
-    "mongodb": "^4.0.0",
+    "mongodb": "^5.7.0",
     "tape": "^4.10.1"
   },
   "homepage": "https://github.com/chilts/mongodb-queue",
