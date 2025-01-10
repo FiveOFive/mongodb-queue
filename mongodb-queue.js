@@ -38,7 +38,8 @@ function Queue(db, name, opts) {
         throw new Error("mongodb-queue: provide a queue name")
     }
     opts = opts || {}
-
+    
+    this.db = db
     this.name = name
     this.col = db.collection(name)
     this.visibility = opts.visibility || 30
