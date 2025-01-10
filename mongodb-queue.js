@@ -119,8 +119,7 @@ Queue.prototype.get = function(opts, callback) {
         }
     }
 
-    self.col.findOneAndUpdate(query, update, { sort: sort, returnDocument : 'after' }).then((result) => {
-        var msg = result.value
+    self.col.findOneAndUpdate(query, update, { sort: sort, returnDocument : 'after' }).then((msg) => {
         if (!msg) return callback()
 
         // convert to an external representation
@@ -173,10 +172,10 @@ Queue.prototype.ping = function(ack, opts, callback) {
         }
     }
     self.col.findOneAndUpdate(query, update, { returnDocument : 'after' }).then((msg) => {
-        if ( !msg.value ) {
+        if ( !msg ) {
             return callback(new Error("Queue.ping(): Unidentified ack  : " + ack))
         }
-        callback(null, '' + msg.value._id)
+        callback(null, '' + msg._id)
     }).catch((err) => callback(err))
 }
 
@@ -194,10 +193,10 @@ Queue.prototype.ack = function(ack, callback) {
         }
     }
     self.col.findOneAndUpdate(query, update, { returnDocument : 'after' }).then((msg) => {
-        if ( !msg.value ) {
+        if ( !msg ) {
             return callback(new Error("Queue.ack(): Unidentified ack : " + ack))
         }
-        callback(null, '' + msg.value._id)
+        callback(null, '' + msg._id)
     }).catch((err) => callback(err))
 }
 
