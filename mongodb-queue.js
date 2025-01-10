@@ -39,7 +39,6 @@ function Queue(db, name, opts) {
     }
     opts = opts || {}
 
-    this.db = db
     this.name = name
     this.col = db.collection(name)
     this.visibility = opts.visibility || 30
@@ -52,7 +51,6 @@ function Queue(db, name, opts) {
 }
 
 Queue.prototype.createIndexes = function(callback) {
-    console.log('index');
     var self = this
 
     self.col.createIndex({ deleted : 1, visible : 1 }).then((indexname) => {
