@@ -38,7 +38,7 @@ function Queue(db, name, opts) {
         throw new Error("mongodb-queue: provide a queue name")
     }
     opts = opts || {}
-    
+
     this.db = db
     this.name = name
     this.col = db.collection(name)
@@ -104,7 +104,7 @@ Queue.prototype.get = function(opts, callback) {
 
     var visibility = opts.visibility || self.visibility
     var query = {
-        deleted : null,
+        deleted: { $exists: false },
         visible : { $lte : now() },
     }
     var sort = {
@@ -163,7 +163,7 @@ Queue.prototype.ping = function(ack, opts, callback) {
     var query = {
         ack     : ack,
         visible : { $gt : now() },
-        deleted : null,
+        deleted: { $exists: false },
     }
     var update = {
         $set : {
@@ -184,7 +184,7 @@ Queue.prototype.ack = function(ack, callback) {
     var query = {
         ack     : ack,
         visible : { $gt : now() },
-        deleted : null,
+        deleted: { $exists: false },
     }
     var update = {
         $set : {
@@ -219,7 +219,7 @@ Queue.prototype.size = function(callback) {
     var self = this
 
     var query = {
-        deleted : null,
+        deleted: { $exists: false },
         visible : { $lte : now() },
     }
 
@@ -232,7 +232,7 @@ Queue.prototype.inFlight = function(callback) {
     var query = {
         ack     : { $exists : true },
         visible : { $gt : now() },
-        deleted : null,
+        deleted: { $exists: false },
     }
 
     self.col.countDocuments(query).then((count) => callback(null, count)).catch((err) => callback(err))
