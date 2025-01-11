@@ -52,7 +52,6 @@ function Queue(db, name, opts) {
 }
 
 Queue.prototype.createIndexes = function(callback) {
-    console.log('index');
     var self = this
 
     self.col.createIndex({ deleted : 1, visible : 1 }).then((indexname) => {
@@ -105,7 +104,7 @@ Queue.prototype.get = function(opts, callback) {
 
     var visibility = opts.visibility || self.visibility
     var query = {
-        deleted : null,
+        deleted: { $exists: false },
         visible : { $lte : now() },
     }
     var sort = {
@@ -119,8 +118,7 @@ Queue.prototype.get = function(opts, callback) {
         }
     }
 
-    self.col.findOneAndUpdate(query, update, { sort: sort, returnDocument : 'after' }).then((result) => {
-        var msg = result.value
+    self.col.findOneAndUpdate(query, update, { sort: sort, returnDocument : 'after' }).then((msg) => {
         if (!msg) return callback()
 
         // convert to an external representation
@@ -165,7 +163,7 @@ Queue.prototype.ping = function(ack, opts, callback) {
     var query = {
         ack     : ack,
         visible : { $gt : now() },
-        deleted : null,
+        deleted: { $exists: false },
     }
     var update = {
         $set : {
@@ -173,10 +171,10 @@ Queue.prototype.ping = function(ack, opts, callback) {
         }
     }
     self.col.findOneAndUpdate(query, update, { returnDocument : 'after' }).then((msg) => {
-        if ( !msg.value ) {
+        if ( !msg ) {
             return callback(new Error("Queue.ping(): Unidentified ack  : " + ack))
         }
-        callback(null, '' + msg.value._id)
+        callback(null, '' + msg._id)
     }).catch((err) => callback(err))
 }
 
@@ -186,7 +184,7 @@ Queue.prototype.ack = function(ack, callback) {
     var query = {
         ack     : ack,
         visible : { $gt : now() },
-        deleted : null,
+        deleted: { $exists: false },
     }
     var update = {
         $set : {
@@ -194,10 +192,10 @@ Queue.prototype.ack = function(ack, callback) {
         }
     }
     self.col.findOneAndUpdate(query, update, { returnDocument : 'after' }).then((msg) => {
-        if ( !msg.value ) {
+        if ( !msg ) {
             return callback(new Error("Queue.ack(): Unidentified ack : " + ack))
         }
-        callback(null, '' + msg.value._id)
+        callback(null, '' + msg._id)
     }).catch((err) => callback(err))
 }
 
@@ -221,7 +219,7 @@ Queue.prototype.size = function(callback) {
     var self = this
 
     var query = {
-        deleted : null,
+        deleted: { $exists: false },
         visible : { $lte : now() },
     }
 
@@ -234,7 +232,7 @@ Queue.prototype.inFlight = function(callback) {
     var query = {
         ack     : { $exists : true },
         visible : { $gt : now() },
-        deleted : null,
+        deleted: { $exists: false },
     }
 
     self.col.countDocuments(query).then((count) => callback(null, count)).catch((err) => callback(err))

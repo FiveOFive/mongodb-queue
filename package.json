@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "async": "^2.6.2",
-    "mongodb": "^5.7.0",
+    "mongodb": "^6.12.0",
     "tape": "^4.10.1"
   },
   "homepage": "https://github.com/chilts/mongodb-queue",
